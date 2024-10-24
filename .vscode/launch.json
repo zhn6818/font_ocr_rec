@@ -17,6 +17,13 @@
             "request": "launch",
             "program": "testapp.py",
             "console": "integratedTerminal"
-        }
+        },
+        {
+            "name": "Python inference",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "inference.py",
+            "console": "integratedTerminal"
+        },
     ]
 }
