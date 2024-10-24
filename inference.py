@@ -4,7 +4,7 @@ sys.path.append("./EasyOCR/")
 
 from easyocr.easyocr import Reader
 
-languages = ['zh', 'en']
+languages = ['ch_sim', 'en']
 
 # 初始化Reader对象
 reader = Reader(languages)
