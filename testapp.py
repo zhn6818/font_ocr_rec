@@ -9,9 +9,16 @@ try:
         response = requests.post(url, files=files)
 
     if response.status_code == 200:
-        with open('processed_image.jpg', 'wb') as f:
-            f.write(response.content)
-        print("Processed image saved as 'processed_image.jpg'")
+        # 从响应中获取OCR结果并打印
+        ocr_results = response.json().get('ocr_results', [])
+        if ocr_results:
+            print("OCR Results:")
+            for item in ocr_results:
+                bbox = item['bbox']
+                # 使用 f-string 格式化输出
+                print(f"Text: {item['text']}, Confidence: {item['confidence']:.2f}, Bounding Box: {bbox['x']} {bbox['y']} {bbox['w']} {bbox['h']}")
+        else:
+            print("No text detected in the image.")
     else:
         print("Error:", response.status_code, response.json())
         

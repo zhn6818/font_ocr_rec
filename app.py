@@ -1,17 +1,21 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify
 from PIL import Image
 import io
 import os
+import sys
+import numpy as np
+
+# 将 EasyOCR 的路径添加到系统路径中
+sys.path.append("./EasyOCR/")
+from easyocr.easyocr import Reader
 
 app = Flask(__name__)
 
-# 图片处理函数，可以自定义
-def process_image(image):
-    # 示例：将图片转为灰度图像
-    grayscale_image = image.convert('L')
-    return grayscale_image
+# 初始化EasyOCR的Reader对象
+languages = ['ch_sim', 'en']
+reader = Reader(languages)
 
-# 接收图片并返回处理后的结果
+# 接收图片并返回OCR识别结果（包括文字区域）
 @app.route('/upload', methods=['POST'])
 def upload_image():
     if 'file' not in request.files:
@@ -26,16 +30,30 @@ def upload_image():
         # 打开上传的图片
         image = Image.open(file.stream)
 
-        # 处理图片
-        processed_image = process_image(image)
+        # 将图像转换为numpy数组以进行OCR处理
+        image_np = np.array(image)
 
-        # 将处理后的图片保存到内存中
-        img_io = io.BytesIO()
-        processed_image.save(img_io, 'JPEG')
-        img_io.seek(0)
+        # 使用EasyOCR的readtext方法进行OCR识别
+        results = reader.readtext(image_np)
 
-        # 返回处理后的图片（这里返回的是图片的字节流，前端需要处理显示）
-        return send_file(img_io, mimetype='image/jpeg')
+        # 将识别结果格式化为JSON可返回的形式
+        ocr_results = []
+        for result in results:
+            # 获取原始的四点坐标
+            bbox = result[0]
+            # 计算 (x, y, w, h) 并转换为int类型
+            x = int(min(point[0] for point in bbox))
+            y = int(min(point[1] for point in bbox))
+            w = int(max(point[0] for point in bbox) - x)
+            h = int(max(point[1] for point in bbox) - y)
+            # OCR识别的文本和置信度
+            text = result[1]
+            confidence = float(result[2])
+            # 添加结果
+            ocr_results.append({'bbox': {'x': x, 'y': y, 'w': w, 'h': h}, 'text': text, 'confidence': confidence})
+
+        # 返回OCR识别结果，包括转换后的bbox信息
+        return jsonify({'ocr_results': ocr_results})
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
