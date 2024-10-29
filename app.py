@@ -26,6 +26,7 @@ def upload_image():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
+
     try:
         # 打开上传的图片
         image = Image.open(file.stream)
