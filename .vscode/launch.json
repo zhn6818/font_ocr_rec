@@ -25,5 +25,19 @@
             "program": "inference.py",
             "console": "integratedTerminal"
         },
+        {
+            "name": "Python inference_full",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "inference_full.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python inference_single",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "inference_single.py",
+            "console": "integratedTerminal"
+        },
     ]
 }
