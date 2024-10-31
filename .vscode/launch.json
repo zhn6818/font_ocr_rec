@@ -39,5 +39,12 @@
             "program": "inference_single.py",
             "console": "integratedTerminal"
         },
+        {
+            "name": "Python inference_detect",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "inference_detect.py",
+            "console": "integratedTerminal"
+        },
     ]
 }
