@@ -8,10 +8,15 @@ from PIL import Image
 sys.path.append("./EasyOCR/")
 
 # 导入修改后的 ReaderRecog 类
-from easyocr.easyocr import ReaderDetect
+from easyocr.easyocr import ReaderDetect, ReaderRecog
 
 # 初始化 ReaderDetect 对象
 detector = ReaderDetect(gpu=False, detect_network="craft", verbose=True)
+
+languages = ['ch_sim', 'en']
+
+# 创建 ReaderRecog 实例
+reader = ReaderRecog(languages, gpu=True)
 
 # 测试图片路径
 image_path = 'test.png'  # 替换为你的图片路径
@@ -31,6 +36,8 @@ horizontal_boxes, free_boxes = detector.detect_img(image_path, text_threshold=0.
 img = cv2.imread(image_path)
 maximum_y,maximum_x,_ = img.shape
 
+all_results = []
+
 # 绘制检测到的区域
 for box in horizontal_boxes[0]:
     # 获取rect区域的坐标
@@ -40,11 +47,13 @@ for box in horizontal_boxes[0]:
     y_max = min(box[3],maximum_y)
     cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2)
 
-# for box in free_boxes:
-#     # 确保将自由形状框的每个点坐标转换为整数
-#     pts = np.array([[int(pt[0]), int(pt[1])] for pt in box], np.int32)
-#     pts = pts.reshape((-1, 1, 2))
-#     cv2.polylines(img, [pts], isClosed=True, color=(0, 0, 255), thickness=2)
+    img_crop = img[y_min:y_max, x_min:x_max]
+    result_crop = reader.read_fulltext(img_crop, output_format='dict')
+
+    all_results.extend(result_crop)
+
+
+print(all_results)
 
 # 保存检测结果
 result_path = 'result.png'
