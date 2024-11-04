@@ -23,14 +23,6 @@ image_path = 'test.png'  # 替换为你的图片路径
 
 horizontal_boxes, free_boxes = detector.detect_img(image_path, text_threshold=0.7, low_text=0.4, link_threshold=0.4)
 
-# # 打印检测结果
-# print("Horizontal Boxes Detected:")
-# for box in horizontal_boxes[0]:
-#     print(box)
-
-# print("\nFree Form Boxes Detected:")
-# for box in free_boxes:
-#     print(box)
 
 # 加载图片
 img = cv2.imread(image_path)
