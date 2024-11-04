@@ -106,7 +106,8 @@ def process_image(detector, reader, font_recognizer, image_path):
     draw = ImageDraw.Draw(img_pil)
 
     font_path = "SimHei.ttf"  # 请确保该字体文件存在于指定路径
-    font = ImageFont.truetype(font_path, 20)
+    font_size = 10  # 调整字体大小
+    font = ImageFont.truetype(font_path, font_size)
 
     # 在图像上绘制文字识别结果
     for result in all_results:
@@ -117,7 +118,22 @@ def process_image(detector, reader, font_recognizer, image_path):
         x_min, y_min = int(box[0][0]), int(box[0][1])
 
         label = f" ({font_line}) {text} ({confidence:.2f})"
-        draw.text((x_min, y_min - 10), label, font=font, fill=(255, 0, 0))
+
+        # 创建一个新的透明图层
+        text_layer = Image.new('RGBA', img_pil.size, (255, 255, 255, 0))
+
+        # 创建 ImageDraw 对象
+        draw_layer = ImageDraw.Draw(text_layer)
+
+        # 设置文本透明度（0-255，0为完全透明，255为完全不透明）
+        opacity = 200  # 设置为200以控制透明度
+        rgba_color = (255, 0, 0, opacity)  # 红色文本，带透明度
+
+        # 在透明图层上绘制文本
+        draw_layer.text((x_min, y_min - 10), label, font=font, fill=rgba_color)
+
+        # 合成文本图层和原图像
+        img_pil = Image.alpha_composite(img_pil.convert('RGBA'), text_layer)
 
     img_pil_path = f'result_{os.path.basename(image_path)}'
     img_pil.save(img_pil_path)
