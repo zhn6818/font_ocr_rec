@@ -3,6 +3,7 @@ import numpy as np
 import sys
 import os
 from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 
 sys.path.append("./EasyOCR/")
@@ -19,7 +20,7 @@ languages = ['ch_sim', 'en']
 reader = ReaderRecog(languages, gpu=True)
 
 # 测试图片路径
-image_path = 'test.png'  # 替换为你的图片路径
+image_path = 'test3.png'  # 替换为你的图片路径
 
 horizontal_boxes, free_boxes = detector.detect_img(image_path, text_threshold=0.7, low_text=0.4, link_threshold=0.4)
 
@@ -65,13 +66,42 @@ for box in horizontal_boxes[0]:
     cropped_images = crop_image_aspect_ratio(img_crop)
 
     result_crop = reader.read_fulltext(img_crop, output_format='dict')
+    # 调整 all_results 中的坐标为原图坐标
+    for result in result_crop:
+        for point in result['boxes']:
+            point[0] += x_min  # x坐标平移
+            point[1] += y_min  # y坐标平移
 
     all_results.extend(result_crop)
 
+# 将 OpenCV 图像转换为 PIL 图像
+img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+draw = ImageDraw.Draw(img_pil)
+
+# 设置字体，确保字体文件路径正确
+font_path = "SimHei.ttf"  # 请确保该字体文件存在于指定路径
+font = ImageFont.truetype(font_path, 20)  # 字体大小可以根据需要调整
+
+# 在图像上绘制文字识别结果
+for result in all_results:
+    # 获取文字内容和置信度
+    text = result['text']
+    confidence = result['confident']
+    
+    # 获取文字区域的坐标框 boxes
+    box = result['boxes']
+    x_min, y_min = int(box[0][0]), int(box[0][1])  # 左上角坐标
+
+    # 绘制文字和置信度
+    label = f"{text} ({confidence:.2f})"
+    draw.text((x_min, y_min - 10), label, font=font, fill=(255, 0, 0))  # 红色文字
+img_pil_path = 'result_pil.png'
+img_pil.save(img_pil_path)
+print(f"检测结果已保存至 {img_pil_path}")
 
 print(all_results)
 
-# 保存检测结果
-result_path = 'result.png'
-cv2.imwrite(result_path, img)
+# # 保存检测结果
+# result_path = 'result.png'
+# cv2.imwrite(result_path, img)
 print(f"检测结果已保存至 {result_path}")
