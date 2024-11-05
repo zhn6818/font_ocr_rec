@@ -8,6 +8,8 @@ from inference_detect import process_image, initialize_readers, calculate_bbox
 
 app = Flask(__name__)
 
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB
+
 detector, reader, font_recognizer = initialize_readers()
 
 
@@ -44,10 +46,10 @@ def predict():
             ocr_results.append({'bbox': {'x': x, 'y': y, 'w': w, 'h': h}, 'text': text, 'confidence': confidence, 'font': font})
 
         # 返回JSON格式的结果
-        return jsonify({'status': 'success', 'data': ocr_results})
+        return jsonify({'status': 'success', 'ocr_results': ocr_results})
 
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)})
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
