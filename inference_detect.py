@@ -135,7 +135,7 @@ def process_image(detector, reader, font_recognizer, image):
         # 在图像上直接绘制文本
         draw.text((x_min, y_min - 10), label, font=font, fill=rgba_color)
 
-    img_pil_path = f'result___.png'
+    img_pil_path = f'result.png'
     img_pil.save(img_pil_path)
     print(all_results)
 
