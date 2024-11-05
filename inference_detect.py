@@ -67,12 +67,12 @@ def initialize_readers():
     font_recognizer = FontDetectionInterface()
     return detector, reader, font_recognizer
 
-def process_image(detector, reader, font_recognizer, image_path):
+def process_image(detector, reader, font_recognizer, image):
     """处理单张图片"""
-    horizontal_boxes, free_boxes = detector.detect_img(image_path, text_threshold=0.7, low_text=0.4, link_threshold=0.4)
+    horizontal_boxes, free_boxes = detector.detect_img(image, text_threshold=0.7, low_text=0.4, link_threshold=0.4)
 
-    img = cv2.imread(image_path)
-    maximum_y, maximum_x, _ = img.shape
+    # img = cv2.imread(image_path)
+    maximum_y, maximum_x, _ = image.shape
 
     all_results = []
 
@@ -82,9 +82,9 @@ def process_image(detector, reader, font_recognizer, image_path):
         x_max = min(box[1], maximum_x)
         y_min = max(0, box[2])
         y_max = min(box[3], maximum_y)
-        cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2)
+        # cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2)
 
-        img_crop = img[y_min:y_max, x_min:x_max]
+        img_crop = image[y_min:y_max, x_min:x_max]
         result_font = crop_image_aspect_ratio(font_recognizer, img_crop)
         # 使用 split 方法分割字符串
         font_string = result_font['most_common_font']
@@ -102,42 +102,41 @@ def process_image(detector, reader, font_recognizer, image_path):
         all_results.extend(result_crop)
 
     # 将 OpenCV 图像转换为 PIL 图像
-    img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    # 假设 img_pil 是PIL图像对象，all_results 是OCR识别的结果列表
+    img_pil = Image.fromarray(image)  # 将NumPy数组转换为PIL图像对象
     draw = ImageDraw.Draw(img_pil)
 
+    # 设置字体路径和大小
     font_path = "SimHei.ttf"  # 请确保该字体文件存在于指定路径
     font_size = 10  # 调整字体大小
     font = ImageFont.truetype(font_path, font_size)
 
-    # 在图像上绘制文字识别结果
+    # 遍历所有的OCR识别结果
     for result in all_results:
         text = result['text']
-        confidence = result['confident']
-        box = result['boxes']
-        font_line = result['font']
+        confidence = result['confident']  # 确保是 'confidence'，而不是 'confident'
+        box = result['boxes']  # 获取矩形框坐标
+        font_line = result['font']  # 字体相关的识别信息
+        
+        # 获取矩形框的坐标 (假设 box 是一个包含四个点的坐标列表)
         x_min, y_min = int(box[0][0]), int(box[0][1])
-
+        x_max, y_max = int(box[2][0]), int(box[2][1])  # 取右下角坐标
+        
+        # 绘制矩形框
+        draw.rectangle([x_min, y_min, x_max, y_max], outline="red", width=2)
+        # print([x_min, y_min, x_max, y_max])
+        
+        # 创建文本标签，包含文本内容和置信度
         label = f" ({font_line}) {text} ({confidence:.2f})"
+        
+        # 设置文本透明度，0为完全透明，255为完全不透明
+        rgba_color = (255, 0, 0)  # 红色文本，去掉透明度
+        
+        # 在图像上直接绘制文本
+        draw.text((x_min, y_min - 10), label, font=font, fill=rgba_color)
 
-        # 创建一个新的透明图层
-        text_layer = Image.new('RGBA', img_pil.size, (255, 255, 255, 0))
-
-        # 创建 ImageDraw 对象
-        draw_layer = ImageDraw.Draw(text_layer)
-
-        # 设置文本透明度（0-255，0为完全透明，255为完全不透明）
-        opacity = 200  # 设置为200以控制透明度
-        rgba_color = (255, 0, 0, opacity)  # 红色文本，带透明度
-
-        # 在透明图层上绘制文本
-        draw_layer.text((x_min, y_min - 10), label, font=font, fill=rgba_color)
-
-        # 合成文本图层和原图像
-        img_pil = Image.alpha_composite(img_pil.convert('RGBA'), text_layer)
-
-    img_pil_path = f'result_{os.path.basename(image_path)}'
+    img_pil_path = f'result___.png'
     img_pil.save(img_pil_path)
-    print(f"检测结果已保存至 {img_pil_path}")
     print(all_results)
 
 def main():
@@ -145,7 +144,9 @@ def main():
     image_paths = ['test1.png', 'test2.png', 'test3.png']  # 替换为你的图片路径列表
 
     for image_path in image_paths:
-        process_image(detector, reader, font_recognizer, image_path)
+        image = Image.open(image_path)
+        image = np.array(image)
+        process_image(detector, reader, font_recognizer, image)
 
 if __name__ == "__main__":
     main()
