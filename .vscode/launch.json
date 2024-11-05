@@ -46,5 +46,19 @@
             "program": "inference_detect.py",
             "console": "integratedTerminal"
         },
+        {
+            "name": "Python appRecog",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "appRecog.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python testRecog",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "testRecog.py",
+            "console": "integratedTerminal"
+        },
     ]
 }

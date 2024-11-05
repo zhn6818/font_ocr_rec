@@ -103,41 +103,59 @@ def process_image(detector, reader, font_recognizer, image):
 
     # 将 OpenCV 图像转换为 PIL 图像
     # 假设 img_pil 是PIL图像对象，all_results 是OCR识别的结果列表
-    img_pil = Image.fromarray(image)  # 将NumPy数组转换为PIL图像对象
-    draw = ImageDraw.Draw(img_pil)
+    # img_pil = Image.fromarray(image)  # 将NumPy数组转换为PIL图像对象
+    # draw = ImageDraw.Draw(img_pil)
 
-    # 设置字体路径和大小
-    font_path = "SimHei.ttf"  # 请确保该字体文件存在于指定路径
-    font_size = 10  # 调整字体大小
-    font = ImageFont.truetype(font_path, font_size)
+    # # 设置字体路径和大小
+    # font_path = "SimHei.ttf"  # 请确保该字体文件存在于指定路径
+    # font_size = 10  # 调整字体大小
+    # font = ImageFont.truetype(font_path, font_size)
 
-    # 遍历所有的OCR识别结果
-    for result in all_results:
-        text = result['text']
-        confidence = result['confident']  # 确保是 'confidence'，而不是 'confident'
-        box = result['boxes']  # 获取矩形框坐标
-        font_line = result['font']  # 字体相关的识别信息
+    # # 遍历所有的OCR识别结果
+    # for result in all_results:
+    #     text = result['text']
+    #     confidence = result['confident']  # 确保是 'confidence'，而不是 'confident'
+    #     box = result['boxes']  # 获取矩形框坐标
+    #     font_line = result['font']  # 字体相关的识别信息
         
-        # 获取矩形框的坐标 (假设 box 是一个包含四个点的坐标列表)
-        x_min, y_min = int(box[0][0]), int(box[0][1])
-        x_max, y_max = int(box[2][0]), int(box[2][1])  # 取右下角坐标
+    #     # 获取矩形框的坐标 (假设 box 是一个包含四个点的坐标列表)
+    #     x_min, y_min = int(box[0][0]), int(box[0][1])
+    #     x_max, y_max = int(box[2][0]), int(box[2][1])  # 取右下角坐标
         
-        # 绘制矩形框
-        draw.rectangle([x_min, y_min, x_max, y_max], outline="green", width=2)
-        # print([x_min, y_min, x_max, y_max])
+    #     # 绘制矩形框
+    #     draw.rectangle([x_min, y_min, x_max, y_max], outline="green", width=2)
+    #     # print([x_min, y_min, x_max, y_max])
         
-        # 创建文本标签，包含文本内容和置信度
-        label = f" ({font_line}) {text} ({confidence:.2f})"
+    #     # 创建文本标签，包含文本内容和置信度
+    #     label = f" ({font_line}) {text} ({confidence:.2f})"
         
-        # 设置文本透明度，0为完全透明，255为完全不透明
-        rgba_color = (255, 0, 0)  # 红色文本，去掉透明度
+    #     # 设置文本透明度，0为完全透明，255为完全不透明
+    #     rgba_color = (255, 0, 0)  # 红色文本，去掉透明度
         
-        # 在图像上直接绘制文本
-        draw.text((x_min, y_min - 10), label, font=font, fill=rgba_color)
+    #     # 在图像上直接绘制文本
+    #     draw.text((x_min, y_min - 10), label, font=font, fill=rgba_color)
 
-    img_pil_path = f'result.png'
-    img_pil.save(img_pil_path)
-    print(all_results)
+    # img_pil_path = f'result.png'
+    # img_pil.save(img_pil_path)
+    # print(all_results)
+    return all_results
+
+def calculate_bbox(box):
+    # 获取四个点的x和y坐标
+    x_coords = [point[0] for point in box]
+    y_coords = [point[1] for point in box]
+
+    # 计算x, y坐标的最小值和最大值
+    x_min = int(min(x_coords))
+    x_max = int(max(x_coords))
+    y_min = int(min(y_coords))
+    y_max = int(max(y_coords))
+
+    # 计算宽度和高度
+    width = int(x_max - x_min)
+    height = int(y_max - y_min)
+
+    return x_min, y_min, width, height
 
 def main():
     detector, reader, font_recognizer = initialize_readers()
@@ -146,7 +164,17 @@ def main():
     for image_path in image_paths:
         image = Image.open(image_path)
         image = np.array(image)
-        process_image(detector, reader, font_recognizer, image)
+        outresult = process_image(detector, reader, font_recognizer, image)
 
+        for result in outresult:
+            # OCR识别的文本和置信度
+            box = result['boxes']
+            x, y, w, h = calculate_bbox(box)
+            text = result["text"]
+            confidence = float(result["confident"])
+            print(text, confidence)
+            print("test")
+        # print(outresult)
+        
 if __name__ == "__main__":
     main()
