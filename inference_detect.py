@@ -123,7 +123,7 @@ def process_image(detector, reader, font_recognizer, image):
         x_max, y_max = int(box[2][0]), int(box[2][1])  # 取右下角坐标
         
         # 绘制矩形框
-        draw.rectangle([x_min, y_min, x_max, y_max], outline="red", width=2)
+        draw.rectangle([x_min, y_min, x_max, y_max], outline="green", width=2)
         # print([x_min, y_min, x_max, y_max])
         
         # 创建文本标签，包含文本内容和置信度
