@@ -166,15 +166,15 @@ def main():
         image = np.array(image)
         outresult = process_image(detector, reader, font_recognizer, image)
 
-        for result in outresult:
-            # OCR识别的文本和置信度
-            box = result['boxes']
-            x, y, w, h = calculate_bbox(box)
-            text = result["text"]
-            confidence = float(result["confident"])
-            print(text, confidence)
-            print("test")
-        # print(outresult)
+        # for result in outresult:
+        #     # OCR识别的文本和置信度
+        #     box = result['boxes']
+        #     x, y, w, h = calculate_bbox(box)
+        #     text = result["text"]
+        #     confidence = float(result["confident"])
+        #     print(text, confidence)
+        #     print("test")
+        print(outresult)
         
 if __name__ == "__main__":
     main()
