@@ -10,3 +10,17 @@ with open('test1.png', 'rb') as f:
 
 # 获取并打印响应
 print(response.json())
+
+# import concurrent.futures
+# import requests
+
+# def send_request():
+#     url = "http://localhost:5000/predict"
+#     files = {'file': open('test1.png', 'rb')}
+#     response = requests.post(url, files=files)
+#     print(response.status_code)
+
+# # 使用 ThreadPoolExecutor 发送多个请求
+# with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+#     for _ in range(5):  # 发送5个并发请求
+#         executor.submit(send_request)
