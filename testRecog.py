@@ -1,5 +1,6 @@
 import requests
 import argparse
+import json
 
 # 创建命令行参数解析器
 parser = argparse.ArgumentParser(description="上传图片并请求预测")
@@ -13,9 +14,11 @@ url = 'http://127.0.0.1:5000/predict'
 with open(args.image_path, 'rb') as f:
     files = {'file': f}
     response = requests.post(url, files=files)
-
+# 假设 response 是请求的返回结果
+response_data = response.json()  # 获取 Python 字典
 # 获取并打印响应
-print(response.json())
+json_string = json.dumps(response_data, ensure_ascii=False)
+print(json_string)  # 现在会以双引号显示
 
 # import concurrent.futures
 # import requests

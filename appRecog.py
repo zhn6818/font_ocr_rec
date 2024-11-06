@@ -6,6 +6,7 @@ from PIL import Image
 import asyncio
 import logging
 from aiohttp import ClientSession
+import json
 
 from inference_detect import process_image, initialize_readers, calculate_bbox
 
@@ -46,10 +47,12 @@ async def predict():
             text = result["text"]
             confidence = float(result["confident"])
             font = result['font']
-            ocr_results.append({'bbox': {'x': x, 'y': y, 'w': w, 'h': h}, 'text': text, 'confidence': confidence, 'font': font})
+            ocr_results.append({"bbox": {'x': x, 'y': y, 'w': w, 'h': h}, "text": text, "confidence": confidence, "font": font})
 
-        # 返回JSON格式的结果
-        return jsonify({'status': 'success', 'ocr_results': ocr_results})
+
+        # 将数据转换为 JSON 字符串，确保双引号
+        json_output = json.dumps({"status": "success", "data": ocr_results}, ensure_ascii=False)
+        return json_output
 
     except Exception as e:
         logging.error(f"Error occurred: {str(e)}")
