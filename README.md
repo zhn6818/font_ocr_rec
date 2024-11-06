@@ -9,3 +9,9 @@
 
 ## python inference_detect.py
 * 批量处理传入的图片，处理结果绘制在原图上。结果保存在result_(文件名)文件中
+
+## python appRecog.py
+* 启动5000端口服务，等待请求
+
+## python testRecog.py test4.png
+* 上述脚本实例为，传入图片进行测试
