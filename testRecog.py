@@ -8,7 +8,10 @@ parser.add_argument('image_path', type=str, help="输入要上传的图片路径
 args = parser.parse_args()
 
 # 设置Flask服务器地址
-url = 'http://127.0.0.1:5000/predict'
+# url = 'http://10.0.0.90:8000/predict'
+url = 'http://it.jetflow.com.cn:8000/predict'
+# url = 'http://localhost:8000/predict'
+# url = 'http://127.0.0.1:8000/predict'
 
 # 打开你想上传的图像
 with open(args.image_path, 'rb') as f:

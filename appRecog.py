@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import cv2
 import numpy as np
 import os
@@ -11,6 +12,8 @@ import json
 from inference_detect import process_image, initialize_readers, calculate_bbox
 
 app = Flask(__name__)
+
+CORS(app)
 
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB
 
@@ -67,4 +70,4 @@ async def process_image_async(detector, reader, font_recognizer, image_np):
     return results
 
 if __name__ == '__main__':
-    app.run(debug=False, use_reloader=False)  # use_reloader=False to avoid asyncio event loop issues
+    app.run(host='0.0.0.0',port=8000,debug=False, use_reloader=False)  # use_reloader=False to avoid asyncio event loop issues

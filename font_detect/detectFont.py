@@ -6,8 +6,8 @@ from detector.fontmodel import ResNet50Regressor,FontDetector
 from detector import config
 
 class FontDetectionInterface:
-    def __init__(self, model_path="/data4/qwy/font_modified.pth", 
-                 font_cache_path = "/data4/qwy/font_demo_cache.bin", device_id=2):
+    def __init__(self, model_path="/data4/qwy/temp/YuzuMarker.FontDetection/tensorboard/be47929_20241101/checkpoints/font_modified.pth", 
+                 font_cache_path = "/data4/qwy/temp/YuzuMarker.FontDetection/tensorboard/be47929_20241101/font_demo_cache.bin", device_id=2):
         self.device = torch.device(f"cuda:{device_id}" if torch.cuda.is_available() else "cpu")
 
         self.model = ResNet50Regressor().to(self.device)

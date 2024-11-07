@@ -72,7 +72,12 @@ def process_image(detector, reader, font_recognizer, image):
     horizontal_boxes, free_boxes = detector.detect_img(image, text_threshold=0.7, low_text=0.4, link_threshold=0.4)
 
     # img = cv2.imread(image_path)
-    maximum_y, maximum_x, _ = image.shape
+    if len(image.shape) == 2:
+        maximum_y, maximum_x = image.shape
+    elif len(image.shape) == 3 and image.shape[2] == 1:
+        maximum_y, maximum_x, _ = image.shape
+    else:
+        maximum_y, maximum_x, _ = image.shape
 
     all_results = []
 
@@ -82,7 +87,7 @@ def process_image(detector, reader, font_recognizer, image):
         x_max = min(box[1], maximum_x)
         y_min = max(0, box[2])
         y_max = min(box[3], maximum_y)
-        # cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2)
+        # cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2)
 
         img_crop = image[y_min:y_max, x_min:x_max]
         result_font = crop_image_aspect_ratio(font_recognizer, img_crop)
@@ -159,7 +164,7 @@ def calculate_bbox(box):
 
 def main():
     detector, reader, font_recognizer = initialize_readers()
-    image_paths = ['test1.png', 'test2.png', 'test3.png']  # 替换为你的图片路径列表
+    image_paths = ['/data4/qwy/temp/YuzuMarker.FontDetection/dataset/font_img/test/font_1_img_0.jpg']  # 替换为你的图片路径列表
 
     for image_path in image_paths:
         image = Image.open(image_path)

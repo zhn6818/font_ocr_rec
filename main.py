@@ -374,7 +374,7 @@ with gr.Blocks() as demo:
 
 gr.close_all() 
 demo.queue()
-demo.launch(server_name="0.0.0.0",server_port=7860)
+demo.launch(server_name="0.0.0.0",server_port=7868)
 
 # import gradio as gr
 
